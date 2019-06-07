@@ -6,12 +6,12 @@
         <div class="text-red" v-if="error">{{ error }}</div>
 
         <div class="mb-6">
-          <label for="email" class="label">E-mail Address</label>
+          <label for="email" class="label">E-mail Address </label>
           <input type="email" v-model="email" class="input" id="email" placeholder="example@email.com">
         </div>
 
         <div class="mb-6">
-          <label for="password" class="label">Password</label>
+          <label for="password" class="label">Password </label>
           <input type="password" v-model="password" class="input" id="password" placeholder="Password">
         </div>
 
@@ -35,7 +35,7 @@ export default {
     return {
       email: '',
       password: '',
-      password: confirmation: '',
+      password_confirmation: '',
       error: ''
     }
   },
