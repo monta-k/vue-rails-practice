@@ -29,7 +29,7 @@ securedAxiosInstance.interceptors.request.use(config => {
   return config
 })
 
-asecuredAxiosInstance.interceptors.response.use(null, error => {
+securedAxiosInstance.interceptors.response.use(null, error => {
   if (error.response && error.response.config && error.response.status === 401) {
     return plainAxiosInstance.post('/refreshaf', {}, { headers: { 'X-CSRF-TOKEN': localStorage.csrf } })
       .then(response => {
