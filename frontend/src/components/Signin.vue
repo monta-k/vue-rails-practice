@@ -14,7 +14,7 @@
           <input type="password" v-model="password" class="input" id="password" placeholder="Password">
         </div>
 
-        <button type="submit" class="font-sans font-bold px-4 rounded cursor-pointer no-underline bg-green hover:bg-green-dark block w-full py-4 text-white items-center justify-center">Sign In</button>
+        <button type="submit" class="font-sans font-bold px-4 rounded cursor-pointer no-underline bg-green hover:bg-green-dark block w-full py-4 items-center justify-center">Sign In</button>
 
         <div class="my-4"><router-link to="/signup" class="link-grey">Sign up</router-link></div>
       </form>
@@ -23,6 +23,8 @@
 </template>
 
 <script>
+import firebase from 'firebase'
+
 export default {
   name: 'Signin',
   data () {
@@ -32,38 +34,16 @@ export default {
       error: ''
     }
   },
-  created() {
-    this.checkSignedIn()
-  },
-  updated() {
-    this.checkSignedIn()
-  },
   methods: {
-    signin() {
-      this.$http.plain.post('/signin', { email: this.email, password: this.password })
-        .then(response => this.signinSuccessful(response))
-        .catch(error => this.signinFailed(error))
-    },
-    signinSuccessful(response) {
-      if(!response.data.csrf) {
-        this.signinFailed(response)
-        return
+    async signin() {
+      try {
+        const res = await firebase.auth().signInWithEmailAndPassword(this.email, this.password)
+        const idToken = await res.user.getIdToken()
+        localStorage.setItem("jwt", idToken.toString());
+      } catch (e) {
+        console.error(e)
       }
-      localStorage.csrf = response.data.csrf
-      localStorage.signedIn = true
-      this.error = ''
-      this.$router.replace('/records')
     },
-    signinFailed(error) {
-      this.error = (error.response && error.response.data && error.response.data.error) || ''
-      delete localStorage.csrf
-      delete localStorage.signedIn
-    },
-    checkSignedIn() {
-      if (localStorage.signedIn) {
-        this.$router.replace('/records')
-      }
-    }
   }
 }
 </script>
