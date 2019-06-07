@@ -40,6 +40,7 @@ export default {
         const res = await firebase.auth().signInWithEmailAndPassword(this.email, this.password)
         const idToken = await res.user.getIdToken()
         localStorage.setItem("jwt", idToken.toString());
+        this.$router.replace('/artists')
       } catch (e) {
         console.error(e)
       }

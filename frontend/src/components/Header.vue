@@ -36,6 +36,7 @@ export default {
       try {
         await firebase.auth().signOut()
         localStorage.removeItem('jwt')
+        this.$router.replace('/')
       }catch (e) {
         console.error(e)
       }

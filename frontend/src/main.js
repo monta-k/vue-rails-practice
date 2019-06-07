@@ -3,6 +3,7 @@ import App from './App.vue'
 import router from './router'
 import VueAxios from 'vue-axios'
 import './firebaseInit'
+import firebase from 'firebase'
 import { securedAxiosInstance, plainAxiosInstance } from './modules/axios'
 import './assets/stylesheet/main.css'
 
@@ -12,10 +13,14 @@ Vue.use(VueAxios, {
   plain: plainAxiosInstance
 })
 
-new Vue({
-  el: '#app',
-  router,
-  securedAxiosInstance,
-  plainAxiosInstance,
-  render: h => h(App)
+
+
+firebase.auth().onAuthStateChanged(() => {
+  new Vue({
+    el: '#app',
+    router,
+    securedAxiosInstance,
+    plainAxiosInstance,
+    render: h => h(App)
+  })
 })
