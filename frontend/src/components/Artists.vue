@@ -54,15 +54,6 @@ export default {
       editedArtist: ''
     }
   },
-  created() {
-    if (!localStorage.signedIn) {
-      this.$router.replace('/')
-    } else {
-      this.$http.secured.get(('/api/v1/artists'))
-        .then(response => { this.artists = response.data })
-        .catch(error => this.setError(error, 'Something went wrong'))
-    }
-  },
   methods: {
     setError(error, text) {
       this.error = (error.response && error.response.data && error.response.data.error) || text

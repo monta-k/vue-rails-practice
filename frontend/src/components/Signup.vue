@@ -15,12 +15,7 @@
           <input type="password" v-model="password" class="input" id="password" placeholder="Password">
         </div>
 
-        <div class="mb-6">
-          <label for="password_confirmation" class="label">Password Confirmation</label>
-          <input type="password" v-model="password_confirmation" class="input" id="password_confirmation" placeholder="Password Confirmation">
-        </div>
-
-        <button type="submit" class="font-sans font-bold px-4 rounded cursor-pointer no-underline bg-green hover:bg-green-dark block w-full py-4 text-white items-center justify-center">Sign Up</button>
+        <button type="submit" class="font-sans font-bold px-4 rounded cursor-pointer no-underline bg-green hover:bg-green-dark block w-full py-4 items-center justify-center">Sign Up</button>
 
         <div class="my-4"><router-link to="/" class="link-grey">Sign In</router-link></div>
       </form>
@@ -29,48 +24,30 @@
 </template>
 
 <script>
+import firebase from 'firebase'
+import axios from 'axios'
+
 export default {
   name: 'Signup',
   data() {
     return {
       email: '',
       password: '',
-      password_confirmation: '',
       error: ''
     }
   },
-  created() {
-    this.checkedSignedIn()
-  },
-  updated() {
-    this.checkedSignedIn()
-  },
   methods: {
-    signup() {
-      this.$http.plain.post('/signup', { email: this.email, password: this.password, password_confirmation: this.password_confirmation })
-        .then(response => this.signupSuccessful(response))
-        .catch(error => this.signupFailed(error))
-    },
-    signupSuccessful(response) {
-      if(!response.data.csrf) {
-        this.signupFailed(response)
-        return
+    async signup() {
+      try {
+        const res = await firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
+        const idToken = await res.user.getIdToken(true)
+        const postAxios = await axios.create({ headers: { Authorization: idToken } })
+        const result = await postAxios.post('http://localhost:3000/signup')
+        console.log('Create account: ', result)
+      } catch (e) {
+        console.log(e.message)
       }
-      localStorage.csrf = response.data.csrf
-      localStorage.signedIn = true
-      this.error = ''
-      this.$router.replace('/records')
     },
-    signupFailed(error) {
-      this.error = (error.response && error.response.data && error.response.data.error) || 'Something went wrong'
-      delete localStorage.csrf
-      delete localStorage.signedIn
-    },
-    checkedSignedIn() {
-      if (localStorage.signedIn) {
-        this.$router.replace('/records')
-      }
-    }
   }
 }
 </script>

@@ -11,13 +11,15 @@
         <router-link to="/signup" class="link-grey px-2 no-underline" v-if="!signedIn()">Sign Up</router-link>
         <router-link to="/records" class="link-grey px-2 no-underline" v-if="signedIn()">Records</router-link>
         <router-link to="/artists" class="link-grey px-2 no-underline" v-if="signedIn()">Artists</router-link>
-        <a href="#" @click.prevent="signOut" class="link-grey px-2 no-underline" v-if="signedIn()">Sign out</a>
+        <a href="#" @click.prevent="signOut" class="link-grey px-2 no-underline">Sign out</a>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import firebase from 'firebase'
+
 export default {
   name: 'Header',
   created() {
@@ -30,14 +32,14 @@ export default {
     signedIn() {
       return localStorage.signedIn
     },
-    signOut() {
-      this.$http.secured.delete('/signin')
-        .then(response => {
-          delete localStorage.csrf
-          delete localStorage.signedIn
-          this.$router.replace('/')
-        })
-        .catch(error => this.setError(error, 'Cannot sign out'))
+    async signOut() {
+      try {
+        await firebase.auth().signOut()
+        localStorage.removeItem('jwt')
+        this.$router.replace('/')
+      }catch (e) {
+        console.error(e)
+      }
     }
   }
 }
