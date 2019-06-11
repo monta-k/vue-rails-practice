@@ -25,6 +25,7 @@
 
 <script>
 import firebase from 'firebase'
+import axios from 'axios'
 
 export default {
   name: 'Signup',
@@ -39,7 +40,10 @@ export default {
     async signup() {
       try {
         const res = await firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
-        console.log('Create account: ', res.user)
+        const idToken = await res.user.getIdToken(true)
+        const postAxios = await axios.create({ headers: { Authorization: idToken } })
+        const result = await postAxios.post('http://localhost:3000/signup')
+        console.log('Create account: ', result)
       } catch (e) {
         console.log(e.message)
       }

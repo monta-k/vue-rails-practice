@@ -1,14 +1,16 @@
 class ApplicationController < ActionController::API
-  include JWTSessions::RailsAuthorization
-  rescue_from JWTSessions::Errors::Unauthorized, with: :not_authorized
-
+  include ActionController::HttpAuthentication::Token::ControllerMethods
+  include SessionsHelper
+  
   private
 
-    def current_user
-      @current_user ||= User.find(payload['user_id'])
-    end
-  
-    def not_authorized
-      render json: { error: 'Not Authorized' }, status: :unauthorized
+    def authenticate_firebase_id_token
+      begin
+        token = request.headers['Authorization']
+        decoded_token = FirebaseHelper::Auth.verify_id_token(token)
+      rescue => e
+        logger.error(e.message)
+        false
+      end
     end
 end
