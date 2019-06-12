@@ -44,7 +44,8 @@
 </template>
 
 <script>
-import axios from 'axios'
+import Artist from '../modules/artist'
+
 export default {
   name: 'Artists',
   data() {
@@ -55,6 +56,10 @@ export default {
       editedArtist: ''
     }
   },
+  async mounted() {
+    const data = await Artist.getAllArtists()
+    this.artists = data
+  },
   methods: {
     setError(error, text) {
       this.error = (error.response && error.response.data && error.response.data.error) || text
@@ -64,30 +69,20 @@ export default {
       if(!value) {
         return
       }
-      const postAxios = await axios.create({ headers: { Authorization: localStorage.getItem('token') } })
-      postAxios.post('http://localhost:3000/api/v1/artists/', { artist: { name: this.newArtist.name }})
-        .then(response => {
-          this.artists.push(response.data)
-          this.newArtist = ''
-        })
-        .catch(error => this.setError(error, 'Cannot create artist'))
+      const data = await Artist.addArtist(this.newArtist.name)
+      this.artists.push(data)
+      this.newArtist = ''
     },
     async removeArtist(artist) {
-      const deleteAxios = await axios.create({ headers: { Authorization: localStorage.getItem('token') } })
-      deleteAxios.delete(`http://localhost:3000/api/v1/artists/${artist.id}`)
-        .then(response => {
-          this.artists.splice(this.artists.indexOf(artist), 1)
-        })
-        .catch(error => this.setError(error, 'Cannot delete artist'))
+      const data = await Artist.deleteArtist(artist.id)
+      this.artists.splice(this.artists.indexOf(artist), 1)
     },
     editArtist(artist) {
       this.editedArtist = artist
     },
     async updateArtist(artist) {
       this.editedArtist = ''
-      const patchAxios = await axios.create({ headers: { Authorization: localStorage.getItem('token') } })
-      patchAxios.patch(`http://localhost:3000/api/v1/artists/${artist.id}`, { artist: { name: artist.name } })
-        .catch(error => this.setError(error, 'Cannot update artist'))
+      await Artist.updateArtist(artist)
     }
   }
 }

@@ -1,6 +1,7 @@
 module Api
   module V1
     class ArtistsController < ApplicationController
+      before_action :authenticate
       before_action :set_artist, only: [:show, :update, :destroy]
 
       # GET /artists
