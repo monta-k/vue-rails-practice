@@ -24,6 +24,7 @@
 
 <script>
 import firebase from 'firebase'
+import axios from 'axios'
 
 export default {
   name: 'Signin',
@@ -38,8 +39,9 @@ export default {
     async signin() {
       try {
         const res = await firebase.auth().signInWithEmailAndPassword(this.email, this.password)
-        const idToken = await res.user.getIdToken()
-        localStorage.setItem("jwt", idToken.toString());
+        const idToken = await res.user.getIdToken(true)
+        localStorage.setItem('token', idToken.toString())
+        console.log('Login Success')
         this.$router.replace('/artists')
       } catch (e) {
         console.error(e)

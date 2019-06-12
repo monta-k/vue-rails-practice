@@ -19,6 +19,7 @@
 
 <script>
 import firebase from 'firebase'
+import axios from 'axios'
 
 export default {
   name: 'Header',
@@ -35,8 +36,9 @@ export default {
     async signOut() {
       try {
         await firebase.auth().signOut()
-        localStorage.removeItem('jwt')
+        localStorage.removeItem('token')
         this.$router.replace('/')
+        console.log('Logout Success')
       }catch (e) {
         console.error(e)
       }

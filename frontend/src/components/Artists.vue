@@ -9,7 +9,7 @@
           placeholder="Type an arist name"
           v-model="newArtist.name" />
       </div>
-      <input type="submit" value="Add Artist" class="font-sans font-bold px-4 rounded cursor-pointer no-underline bg-green hover:bg-green-dark block w-full py-4 text-white items-center justify-center" />
+      <input type="submit" value="Add Artist" class="font-sans font-bold px-4 rounded cursor-pointer no-underline bg-green hover:bg-green-dark block w-full py-4 items-center justify-center" />
     </form>
 
     <hr class="border border-grey-light my-6" />
@@ -23,10 +23,10 @@
             {{ artist.name }}
           </p>
 
-          <button class="bg-tranparent text-sm hover:bg-blue hover:text-white text-blue border border-blue no-underline font-bold py-2 px-4 mr-2 rounded"
+          <button class="bg-tranparent text-sm hover:bg-blue text-blue border border-blue no-underline font-bold py-2 px-4 mr-2 rounded"
           @click.prevent="editArtist(artist)">Edit</button>
 
-          <button class="bg-transprent text-sm hover:bg-red text-red hover:text-white no-underline font-bold py-2 px-4 rounded border border-red"
+          <button class="bg-transprent text-sm hover:bg-red text-red no-underline font-bold py-2 px-4 rounded border border-red"
          @click.prevent="removeArtist(artist)">Delete</button>
         </div>
 
@@ -34,7 +34,7 @@
           <form action="" @submit.prevent="updateArtist(artist)">
             <div class="mb-6 p-4 bg-white rounded border border-grey-light mt-4">
               <input class="input" v-model="artist.name" />
-              <input type="submit" value="Update" class=" my-2 bg-transparent text-sm hover:bg-blue hover:text-white text-blue border border-blue no-underline font-bold py-2 px-4 rounded cursor-pointer">
+              <input type="submit" value="Update" class=" my-2 bg-transparent text-sm hover:bg-blue text-blue border border-blue no-underline font-bold py-2 px-4 rounded cursor-pointer">
             </div>
           </form>
         </div>
@@ -44,6 +44,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   name: 'Artists',
   data() {
@@ -58,20 +59,22 @@ export default {
     setError(error, text) {
       this.error = (error.response && error.response.data && error.response.data.error) || text
     },
-    addArtist() {
+    async addArtist() {
       const value = this.newArtist
       if(!value) {
         return
       }
-      this.$http.secured.post('/api/v1/artists/', { artist: { name: this.newArtist.name }})
+      const postAxios = await axios.create({ headers: { Authorization: localStorage.getItem('token') } })
+      postAxios.post('http://localhost:3000/api/v1/artists/', { artist: { name: this.newArtist.name }})
         .then(response => {
           this.artists.push(response.data)
           this.newArtist = ''
         })
         .catch(error => this.setError(error, 'Cannot create artist'))
     },
-    removeArtist(artist) {
-      this.$http.secured.delete(`/api/v1/artists/${artist.id}`)
+    async removeArtist(artist) {
+      const deleteAxios = await axios.create({ headers: { Authorization: localStorage.getItem('token') } })
+      deleteAxios.delete(`http://localhost:3000/api/v1/artists/${artist.id}`)
         .then(response => {
           this.artists.splice(this.artists.indexOf(artist), 1)
         })
@@ -80,9 +83,10 @@ export default {
     editArtist(artist) {
       this.editedArtist = artist
     },
-    updateArtist(artist) {
+    async updateArtist(artist) {
       this.editedArtist = ''
-      this.$http.secured.patch(`/api/v1/artists/${artist.id}`, { artist: { name: artist.name } })
+      const patchAxios = await axios.create({ headers: { Authorization: localStorage.getItem('token') } })
+      patchAxios.patch(`http://localhost:3000/api/v1/artists/${artist.id}`, { artist: { name: artist.name } })
         .catch(error => this.setError(error, 'Cannot update artist'))
     }
   }
