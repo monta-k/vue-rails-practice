@@ -24,8 +24,7 @@
 </template>
 
 <script>
-import firebase from 'firebase'
-import axios from 'axios'
+import Session from '../modules/session'
 
 export default {
   name: 'Signup',
@@ -38,15 +37,9 @@ export default {
   },
   methods: {
     async signup() {
-      try {
-        const res = await firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
-        const idToken = await res.user.getIdToken(true)
-        const postAxios = await axios.create({ headers: { Authorization: idToken } })
-        const result = await postAxios.post('http://localhost:3000/signup')
-        console.log('Create account: ', result)
-      } catch (e) {
-        console.log(e.message)
-      }
+      await Session.signUp(this.email, this.password)
+      await Session.signIn(this.email, this.password)
+      this.$router.replace('/artists')
     },
   }
 }

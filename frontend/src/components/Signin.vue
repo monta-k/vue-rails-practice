@@ -23,8 +23,7 @@
 </template>
 
 <script>
-import firebase from 'firebase'
-import axios from 'axios'
+import Session from '../modules/session'
 
 export default {
   name: 'Signin',
@@ -37,15 +36,8 @@ export default {
   },
   methods: {
     async signin() {
-      try {
-        const res = await firebase.auth().signInWithEmailAndPassword(this.email, this.password)
-        const idToken = await res.user.getIdToken(true)
-        localStorage.setItem('token', idToken.toString())
-        console.log('Login Success')
-        this.$router.replace('/artists')
-      } catch (e) {
-        console.error(e)
-      }
+      await Session.signIn(this.email, this.password)
+      this.$router.replace('/artists')
     },
   }
 }
