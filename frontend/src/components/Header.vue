@@ -19,7 +19,7 @@
 
 <script>
 import firebase from 'firebase'
-import axios from 'axios'
+import Session from '../modules/session'
 
 export default {
   name: 'Header',
@@ -29,8 +29,7 @@ export default {
     },
     async signOut() {
       try {
-        await firebase.auth().signOut()
-        localStorage.removeItem('token')
+        Session.signOut()
         this.$router.replace('/')
         console.log('Logout Success')
       }catch (e) {
