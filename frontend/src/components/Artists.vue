@@ -65,8 +65,7 @@ export default {
       this.error = (error.response && error.response.data && error.response.data.error) || text
     },
     async addArtist() {
-      const value = this.newArtist
-      if(!value) {
+      if(!this.newArtist) {
         return
       }
       const data = await Artist.addArtist(this.newArtist.name)

@@ -7,10 +7,10 @@
         <a href="/" class="uppercase text-sm font-mono pl-4 font-semibold no-underline text-indigo-dark hover:text-indigo-darker">Record Store</a>
       </div>
       <div>
-        <router-link to="/" class="link-grey px-2 no-underline" v-if="!signedIn()">Sign in</router-link>
-        <router-link to="/signup" class="link-grey px-2 no-underline" v-if="!signedIn()">Sign Up</router-link>
-        <router-link to="/records" class="link-grey px-2 no-underline" v-if="signedIn()">Records</router-link>
-        <router-link to="/artists" class="link-grey px-2 no-underline" v-if="signedIn()">Artists</router-link>
+        <router-link to="/" class="link-grey px-2 no-underline">Sign in</router-link>
+        <router-link to="/signup" class="link-grey px-2 no-underline">Sign Up</router-link>
+        <router-link to="/records" class="link-grey px-2 no-underline">Records</router-link>
+        <router-link to="/artists" class="link-grey px-2 no-underline">Artists</router-link>
         <a href="#" @click.prevent="signOut" class="link-grey px-2 no-underline">Sign out</a>
       </div>
     </div>
@@ -23,15 +23,9 @@ import axios from 'axios'
 
 export default {
   name: 'Header',
-  created() {
-    this.signedIn()
-  },
   methods: {
     setError(error, text) {
       this.error = (error.response && error.response.data && error.response.data.error) || text
-    },
-    signedIn() {
-      return localStorage.signedIn
     },
     async signOut() {
       try {
