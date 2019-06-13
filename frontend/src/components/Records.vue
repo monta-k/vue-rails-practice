@@ -2,7 +2,7 @@
   <div class="max-w-md m-auto py-10">
     <div class="text-red" v-if="error">{{ error }}</div>
     <h3 class="font-mono font-regular text-3xl mb-4">Add a new record</h3>
-    <form action="" @submit.prevent="addRecord">
+    <form action="" @submit.prevent="addRecord()">
       <div class="mb-6">
         <label for="record_title" class="label">Title</label>
         <input
@@ -33,7 +33,7 @@
         <p class="pt-4">Don't see an artist? <router-link class="text-grey-darker underline" to="/artists">Create one</router-link></p>
        </div>
 
-      <input type="submit" value="Add Record" class="font-sans font-bold px-4 rounded cursor-pointer no-underline bg-green hover:bg-green-dark block w-full py-4 text-white items-center justify-center" />
+      <input type="submit" value="Add Record" class="font-sans font-bold px-4 rounded cursor-pointer no-underline bg-green hover:bg-green-dark block w-full py-4 items-center justify-center" />
     </form>
 
     <hr class="border border-grey-light my-6" />
@@ -49,10 +49,10 @@
             </p>
             <p class="block font-mono font-semibold">{{ getArtist(record) }}</p>
           </div>
-          <button class="bg-transparent text-sm hover:bg-blue hover:text-white text-blue border border-blue no-underline font-bold py-2 px-4 mr-2 rounded"
+          <button class="bg-transparent text-sm hover:bg-blue text-blue border border-blue no-underline font-bold py-2 px-4 mr-2 rounded"
           @click.prevent="editRecord(record)">Edit</button>
 
-          <button class="bg-transparent text-sm hover:bg-red text-red hover:text-white no-underline font-bold py-2 px-4 rounded border border-red"
+          <button class="bg-transparent text-sm hover:bg-red text-red no-underline font-bold py-2 px-4 rounded border border-red"
          @click.prevent="removeRecord(record)">Delete</button>
         </div>
 
@@ -87,6 +87,9 @@
 </template>
 
 <script>
+import Record from '../modules/record'
+import Artist from '../modules/artist'
+
 export default {
   name: 'Records',
   data () {
@@ -97,6 +100,10 @@ export default {
       error: '',
       editedRecord: ''
     }
+  },
+  async mounted() {
+    this.records = await Record.getAllRecords()
+    this.artists = await Artist.getAllArtists()
   },
   methods: {
     setError (error, text) {
@@ -112,33 +119,24 @@ export default {
 
       return artist
     },
-    addRecord () {
-      const value = this.newRecord
-      if (!value) {
+    async addRecord () {
+      if (!this.newRecord) {
         return
       }
-      this.$http.secured.post('/api/v1/records/', { record: { title: this.newRecord.title, year: this.newRecord.year, artist_id: this.newRecord.artist } })
-
-        .then(response => {
-          this.records.push(response.data)
-          this.newRecord = ''
-        })
-        .catch(error => this.setError(error, 'Cannot create record'))
+      const data = await Record.addRecord(this.newRecord)
+      this.records.push(data)
+      this.newRecord = ''
     },
-    removeRecord (record) {
-      this.$http.secured.delete(`/api/v1/records/${record.id}`)
-        .then(response => {
-          this.records.splice(this.records.indexOf(record), 1)
-        })
-        .catch(error => this.setError(error, 'Cannot delete record'))
+    async removeRecord (record) {
+      await Record.deleteRecord(record.id)
+      this.records.splice(this.records.indexOf(record), 1)
     },
     editRecord (record) {
       this.editedRecord = record
     },
     updateRecord (record) {
       this.editedRecord = ''
-      this.$http.secured.patch(`/api/v1/records/${record.id}`, { record: { title: record.title, year: record.year, artist_id: record.artist } })
-        .catch(error => this.setError(error, 'Cannot update record'))
+      Record.updateRecord(record)
     }
   }
 }
